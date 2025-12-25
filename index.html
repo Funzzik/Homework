@@ -1,0 +1,1217 @@
+<!-- cвистунова -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квест по языкам программирования</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: #4A4A4A;
+        }
+
+        .background-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .code-bracket {
+            color: #8A2BE2;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-symbol {
+            color: #DA70D6;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .language-icon {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(138, 43, 226, 0.1);
+            animation: float 25s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(20px, 50px) rotate(10deg);
+            }
+            50% {
+                transform: translate(-30px, 100px) rotate(-10deg);
+            }
+            75% {
+                transform: translate(15px, 150px) rotate(5deg);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .screen {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #8A2BE2;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.1);
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.05) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 40s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #8A2BE2;
+            text-shadow: 0 2px 4px rgba(138, 43, 226, 0.2);
+            background: linear-gradient(45deg, #8A2BE2, #DA70D6, #9370DB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #8A2BE2, transparent);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-style: italic;
+            position: relative;
+        }
+
+        .subtitle::before,
+        .subtitle::after {
+            content: '✦';
+            margin: 0 10px;
+            color: #8A2BE2;
+        }
+
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 1.2rem;
+            border-radius: 15px;
+            border-left: 4px solid #8A2BE2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            font-size: 4rem;
+            color: rgba(138, 43, 226, 0.1);
+            font-family: Georgia, serif;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 1.2rem;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+            color: #333;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.1), transparent);
+            transition: all 0.5s;
+        }
+
+        .option:hover::before {
+            left: 100%;
+        }
+
+        .option:hover {
+            transform: translateY(-4px) scale(1.03);
+            border-color: #8A2BE2;
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
+            background: linear-gradient(135deg, #f9f4ff, #f0e6ff);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #f0e0ff, #e0c8ff);
+            border-color: #8A2BE2;
+            color: #8A2BE2;
+            box-shadow: 0 6px 16px rgba(138, 43, 226, 0.4);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #e6f7ee, #d1f0e0);
+            border-color: #28a745;
+            color: #155724;
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, #fdeaea, #f8d4d4);
+            border-color: #dc3545;
+            color: #721c24;
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+        }
+
+        button {
+            background: linear-gradient(135deg, #8A2BE2, #DA70D6);
+            color: white;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 auto;
+            display: block;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(30deg);
+            transition: all 0.6s;
+        }
+
+        button:hover::after {
+            transform: rotate(30deg) translate(100%, 100%);
+        }
+
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(138, 43, 226, 0.6);
+            background: linear-gradient(135deg, #7a1bd2, #c850c0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+        }
+
+        .progress-container {
+            background: linear-gradient(90deg, #f0f0f0, #e8e8e8);
+            border-radius: 25px;
+            height: 14px;
+            margin: 1.2rem 0;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #8A2BE2, #DA70D6);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .progress {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: #8A2BE2;
+            font-weight: 700;
+        }
+
+        .timer {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .attempts {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #8A2BE2;
+            font-weight: 700;
+        }
+
+        .hearts {
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .heart {
+            color: #ff6b6b;
+            font-size: 1.3rem;
+            display: inline-block;
+            margin: 0 3px;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.5);
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 1.5rem 0;
+            min-height: 2rem;
+            color: #333;
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #1a181f, #2d2a35);
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border: 1px solid #444;
+            color: #f8f8f2;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8A2BE2, #DA70D6, #9370DB);
+        }
+
+        .language-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #8A2BE2, #DA70D6);
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .final-message {
+            text-align: center;
+            font-size: 1.6rem;
+            margin: 2rem 0;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 2px dashed #8A2BE2;
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.15);
+        }
+
+        .score-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #8A2BE2;
+            margin: 1rem 0;
+            text-shadow: 0 2px 6px rgba(138, 43, 226, 0.3);
+            background: linear-gradient(45deg, #8A2BE2, #DA70D6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .level-indicator {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            color: #8A2BE2;
+            font-weight: 700;
+        }
+
+        .level-indicator span {
+            background: linear-gradient(135deg, #8A2BE2, #DA70D6);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            color: white;
+            margin: 0 0.5rem;
+            box-shadow: 0 2px 8px rgba(138, 43, 226, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .screen {
+                padding: 1.5rem;
+            }
+            
+            .floating-element {
+                font-size: 18px;
+            }
+        }
+
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #8A2BE2;
+            }
+            to {
+                box-shadow: 0 0 20px #DA70D6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-elements" id="backgroundElements"></div>
+    <div class="celebration" id="celebration"></div>
+    
+    <div class="container">
+        <div id="welcome" class="screen active">
+            <h1>🚀 Квест по языкам программирования</h1>
+            <div class="subtitle">Испытай свои знания и стань мастером кода!</div>
+            <div class="final-message">
+                <p>🎯 <strong>Уровень 1: Теория</strong> - 20 вопросов, нужно 15+ правильных ответов</p>
+                <p>💻 <strong>Уровень 2: Практика</strong> - 10 заданий с реальным кодом</p>
+                <p>⏱️ У каждого вопроса есть 10 секунд и 3 жизни (сердечка ❤️)</p>
+                <p>✨ За каждый правильный ответ - бонусные очки!</p>
+            </div>
+            <button onclick="startQuiz()">Начать приключение</button>
+        </div>
+
+        <div id="theory" class="screen">
+            <h1>📚 Уровень 1: Теория</h1>
+            <div class="level-indicator">
+                <span>Вопросы по HTML, CSS, JavaScript, PHP, Java</span>
+            </div>
+            <div class="progress">
+                Вопрос <span id="theoryCurrent">1</span> из <span id="theoryTotal">20</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="theoryProgressBar" style="width: 5%"></div>
+            </div>
+            <div class="attempts">
+                Жизни: <span class="hearts" id="theoryHearts">❤️❤️❤️</span>
+            </div>
+            <div class="timer" id="theoryTimer">10</div>
+            <div class="question" id="theoryQuestion"></div>
+            <div class="options" id="theoryOptions"></div>
+            <button onclick="submitTheoryAnswer()" id="theorySubmit" disabled>Проверить ответ</button>
+            <div class="result" id="theoryResult"></div>
+        </div>
+
+        <div id="practice" class="screen">
+            <h1>💻 Уровень 2: Практика</h1>
+            <div class="level-indicator">
+                <span>Анализ реального кода и отладка</span>
+            </div>
+            <div class="progress">
+                Задание <span id="practiceCurrent">1</span> из <span id="practiceTotal">10</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="practiceProgressBar" style="width: 10%"></div>
+            </div>
+            <div class="attempts">
+                Жизни: <span class="hearts" id="practiceHearts">❤️❤️❤️</span>
+            </div>
+            <div class="timer" id="practiceTimer">10</div>
+            <div class="language-tag" id="practiceLanguage"></div>
+            <div class="question" id="practiceQuestion"></div>
+            <div class="code-block" id="practiceCode"></div>
+            <div class="options" id="practiceOptions"></div>
+            <button onclick="submitPracticeAnswer()" id="practiceSubmit" disabled>Проверить решение</button>
+            <div class="result" id="practiceResult"></div>
+        </div>
+        <div id="final" class="screen">
+            <h1>🏆 Результаты квеста</h1>
+            <div class="final-message" id="finalMessage"></div>
+            <div class="score-display" id="finalScore"></div>
+            <button onclick="restartQuiz()">Начать заново</button>
+        </div>
+    </div>
+
+    <script>
+        function createBackgroundElements() {
+            const backgroundContainer = document.getElementById('backgroundElements');
+            const elementCount = 30;
+            const codeElements = ['{', '}', '[', ']', '(', ')', ';', ':', '=', '+', '-', '*', '/', '%', '&', '|', '!', '?', '#', '@', '$'];
+            const languageIcons = ['HTML', 'CSS', 'JS', 'PHP', 'JAVA'];
+            
+            for (let i = 0; i < elementCount; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                if (Math.random() > 0.6) {
+                    element.textContent = languageIcons[Math.floor(Math.random() * languageIcons.length)];
+                    element.classList.add('language-icon');
+                } else {
+                    element.textContent = codeElements[Math.floor(Math.random() * codeElements.length)];
+                    if (Math.random() > 0.5) {
+                        element.classList.add('code-bracket');
+                    } else {
+                        element.classList.add('code-symbol');
+                    }
+                }
+                
+                const size = Math.random() * 20 + 12;
+                element.style.fontSize = `${size}px`;
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                const duration = 15 + Math.random() * 25;
+                const delay = Math.random() * 10;
+                element.style.animationDuration = `${duration}s`;
+                element.style.animationDelay = `${delay}s`;
+                element.style.opacity = `${0.1 + Math.random() * 0.4}`;
+                if (element.classList.contains('code-symbol')) {
+                    const colors = ['#DA70D6', '#9370DB', '#BA55D3', '#9400D3'];
+                    element.style.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                
+                backgroundContainer.appendChild(element);
+            }
+            const bubbleCount = 15;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 80 + 30;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.top = `${Math.random() * 100}%`;
+                
+                bubble.style.animationDuration = `${20 + Math.random() * 20}s`;
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                
+                bubble.style.opacity = `${0.05 + Math.random() * 0.15}`;
+                
+                backgroundContainer.appendChild(bubble);
+            }
+        }
+
+        function createCelebration() {
+            const celebration = document.getElementById('celebration');
+            celebration.style.display = 'block';
+            celebration.innerHTML = '';
+            
+            const colors = ['#8A2BE2', '#DA70D6', '#9370DB', '#FF69B4', '#4B0082', '#BA55D3', '#9400D3'];
+            
+            for (let i = 0; i < 200; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 4}px`;
+                confetti.style.height = confetti.style.width;
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                confetti.style.opacity = `${0.7 + Math.random() * 0.3}`;
+                celebration.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                celebration.style.display = 'none';
+            }, 3000);
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        function getHearts(attempts) {
+            let hearts = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < attempts) {
+                    hearts += '❤️';
+                } else {
+                    hearts += '💔';
+                }
+            }
+            return hearts;
+        }
+        const theoryQuestions = [
+            {
+                question: "Какой язык программирования получил свое название в честь комедийного шоу 'Монти Пайтон'?",
+                options: ["Java", "Python", "JavaScript", "Ruby"],
+                correct: 1
+            },
+            {
+                question: "В каком году был создан язык JavaScript?",
+                options: ["1995", "1998", "2001", "1992"],
+                correct: 0
+            },
+            {
+                question: "Какой из этих языков компилируется в байт-код и выполняется виртуальной машиной?",
+                options: ["JavaScript", "PHP", "Java", "Python"],
+                correct: 2
+            },
+            {
+                question: "Какой HTML-тег используется для создания формы?",
+                options: ["<input>", "<form>", "<div>", "<section>"],
+                correct: 1
+            },
+            {
+                question: "Что делает CSS-свойство 'box-sizing: border-box'?",
+                options: ["Включает padding и border в общую ширину элемента", "Исключает padding из ширины", "Добавляет тень к элементу", "Центрирует элемент"],
+                correct: 0
+            },
+            {
+                question: "Какой метод массива в JavaScript удаляет последний элемент?",
+                options: ["shift()", "pop()", "remove()", "delete()"],
+                correct: 1
+            },
+            {
+                question: "Какая команда в PHP используется для подключения внешнего файла?",
+                options: ["#include", "import", "require", "load"],
+                correct: 2
+            },
+            {
+                question: "Какой селектор CSS выбирает первый дочерний элемент?",
+                options: [":first", ":first-child", ":first-of-type", ":child(1)"],
+                correct: 1
+            },
+            {
+                question: "Что возвращает выражение '5' + 3 в JavaScript?",
+                options: ["8", "'53'", "Ошибка", "'8'"],
+                correct: 1
+            },
+            {
+                question: "Какой HTTP-метод используется для отправки данных формы?",
+                options: ["GET", "POST", "SEND", "SUBMIT"],
+                correct: 1
+            },
+            {
+                question: "Какой язык является основным для Android-разработки?",
+                options: ["Swift", "Kotlin", "Java", "C#"],
+                correct: 2
+            },
+            {
+                question: "Что означает 'NaN' в JavaScript?",
+                options: ["Not a Number", "New and Nice", "Number and Null", "Not any Number"],
+                correct: 0
+            },
+            {
+                question: "Какой тег HTML5 используется для навигации?",
+                options: ["<nav>", "<navigation>", "<menu>", "<links>"],
+                correct: 0
+            },
+            {
+                question: "Какой CSS-свойство создает плавные переходы?",
+                options: ["transition", "animation", "transform", "smooth"],
+                correct: 0
+            },
+            {
+                question: "В каком языке используется точка с запятой как обязательный разделитель?",
+                options: ["Python", "JavaScript", "Ruby", "HTML"],
+                correct: 1
+            },
+            {
+                question: "Какой метод в Java является точкой входа в программу?",
+                options: ["start()", "init()", "main()", "run()"],
+                correct: 2
+            },
+            {
+                question: "Что делает функция 'console.log()' в JavaScript?",
+                options: ["Выводит данные в консоль", "Создает лог-файл", "Отправляет данные на сервер", "Записывает в базу данных"],
+                correct: 0
+            },
+            {
+                question: "Какой атрибут HTML делает поле формы обязательным?",
+                options: ["required", "mandatory", "necessary", "essential"],
+                correct: 0
+            },
+            {
+                question: "Какой CSS-свойство выравнивает текст по центру?",
+                options: ["text-align: center", "align: center", "center-text", "text-center"],
+                correct: 0
+            },
+            {
+                question: "Какой символ используется для однострочного комментария в PHP?",
+                options: ["//", "#", "/*", "<!--"],
+                correct: 0
+            }
+        ];
+        const practiceQuestions = [
+            {
+                language: "JavaScript",
+                question: "Что выведет этот код в консоль?",
+                code: "let x = 1;\nlet y = '1';\nconsole.log(x === y);",
+                options: ["true", "false", "1", "Ошибка"],
+                correct: 1
+            },
+            {
+                language: "CSS",
+                question: "Почему текст не центрируется по вертикали?",
+                code: ".container {\n  height: 200px;\n  text-align: center;\n}\n\n<div class=\"container\">\n  <p>Текст</p>\n</div>",
+                options: ["Нужен display: flex", "Нужен vertical-align", "Нужен line-height", "Все правильно"],
+                correct: 2
+            },
+            {
+                language: "HTML",
+                question: "Что не так с семантикой этого кода?",
+                code: "<div>\n  <h1>Заголовок</h1>\n  <div>Содержимое</div>\n</div>",
+                options: ["Нужен тег <article>", "Нужен тег <section>", "Нужен тег <main>", "Все правильно"],
+                correct: 1
+            },
+            {
+                language: "PHP",
+                question: "Что выведет этот код?",
+                code: "<?php\n  $arr = [1, 2, 3];\n  echo count($arr);\n?>",
+                options: ["2", "3", "4", "Ошибка"],
+                correct: 1
+            },
+            {
+                language: "JavaScript",
+                question: "Почему переменная 'result' равна undefined?",
+                code: "function calculate() {\n  let x = 5;\n}\n\nconst result = calculate();",
+                options: ["Функция не возвращает значение", "Переменная не объявлена", "Ошибка синтаксиса", "Нужен return"],
+                correct: 0
+            },
+            {
+                language: "CSS",
+                question: "Как сделать, чтобы блок занимал всю высоту родителя?",
+                code: ".child {\n  /* Какой стиль добавить? */\n}\n\n.parent {\n  height: 300px;\n}",
+                options: ["height: 100%", "height: auto", "height: inherit", "height: parent"],
+                correct: 0
+            },
+            {
+                language: "HTML",
+                question: "Как правильно подключить внешний CSS-файл?",
+                code: "<!-- Какой тег использовать? -->",
+                options: ["<link rel=\"stylesheet\" href=\"style.css\">", "<style src=\"style.css\">", "<css href=\"style.css\">", "<import href=\"style.css\">"],
+                correct: 0
+            },
+            {
+                language: "Java",
+                question: "Что выведет этот код?",
+                code: "String s1 = \"hello\";\nString s2 = new String(\"hello\");\nSystem.out.println(s1 == s2);",
+                options: ["true", "false", "hello", "Ошибка"],
+                correct: 1
+            },
+            {
+                language: "JavaScript",
+                question: "Что такое результат выполнения?",
+                code: "const arr = [1, 2, 3];\nconst doubled = arr.map(x => x * 2);\nconsole.log(doubled);",
+                options: ["[1, 2, 3]", "[2, 4, 6]", "[3, 6, 9]", "Ошибка"],
+                correct: 1
+            },
+            {
+                language: "PHP",
+                question: "Как правильно объявить функцию в PHP?",
+                code: "// Какой синтаксис правильный?",
+                options: ["function myFunc() {}", "def myFunc() {}", "func myFunc() {}", "myFunc() => {}"],
+                correct: 0
+            }
+        ];
+
+        let currentTheoryQuestion = 0;
+        let theoryScore = 0;
+        let selectedTheoryOption = null;
+        let theoryAttempts = 3;
+        let theoryTimer = null;
+        let shuffledTheoryQuestions = [];
+        
+        let currentPracticeQuestion = 0;
+        let practiceScore = 0;
+        let selectedPracticeOption = null;
+        let practiceAttempts = 3;
+        let practiceTimer = null;
+        let shuffledPracticeQuestions = [];
+
+        createBackgroundElements();
+
+        function startTimer(screenType, callback) {
+            const timerElement = document.getElementById(screenType + 'Timer');
+            let timeLeft = 10;
+            timerElement.textContent = timeLeft;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerElement.textContent = "0";
+                    timerElement.classList.add('glow');
+                    setTimeout(() => {
+                        timerElement.classList.remove('glow');
+                    }, 1000);
+                    callback();
+                }
+            }, 1000);
+            
+            return timer;
+        }
+
+        function startQuiz() {
+            document.getElementById('welcome').classList.remove('active');
+            document.getElementById('theory').classList.add('active');
+            shuffledTheoryQuestions = shuffleArray(theoryQuestions);
+            shuffledPracticeQuestions = shuffleArray(practiceQuestions);
+            currentTheoryQuestion = 0;
+            theoryScore = 0;
+            theoryAttempts = 3;
+            
+            loadTheoryQuestion();
+        }
+
+        function loadTheoryQuestion() {
+            if (currentTheoryQuestion >= shuffledTheoryQuestions.length) {
+                if (theoryScore >= 15) {
+                    document.getElementById('theory').classList.remove('active');
+                    document.getElementById('practice').classList.add('active');
+                    currentPracticeQuestion = 0;
+                    practiceScore = 0;
+                    practiceAttempts = 3;
+                    
+                    loadPracticeQuestion();
+                } else {
+                    document.getElementById('theory').classList.remove('active');
+                    document.getElementById('final').classList.add('active');
+                    document.getElementById('finalMessage').innerHTML = 
+                        `❌ <strong>К сожалению, вы не прошли теоретический уровень!</strong><br><br>Правильных ответов: ${theoryScore} из 20<br>Нужно минимум 15 для перехода к практике.`;
+                    document.getElementById('finalScore').textContent = `Ваш результат: ${theoryScore} очков`;
+                }
+                return;
+            }
+
+            const question = shuffledTheoryQuestions[currentTheoryQuestion];
+            document.getElementById('theoryQuestion').textContent = question.question;
+            document.getElementById('theoryCurrent').textContent = currentTheoryQuestion + 1;
+            document.getElementById('theoryTotal').textContent = shuffledTheoryQuestions.length;
+            document.getElementById('theoryHearts').innerHTML = getHearts(theoryAttempts);
+            const progressPercent = ((currentTheoryQuestion) / shuffledTheoryQuestions.length) * 100;
+            document.getElementById('theoryProgressBar').style.width = progressPercent + '%';
+            if (theoryTimer) {
+                clearInterval(theoryTimer);
+                theoryTimer = null;
+            }
+            
+            theoryTimer = startTimer('theory', () => {
+                document.getElementById('theoryResult').innerHTML = '⏰ <strong>Время вышло!</strong> Правильный ответ будет показан...';
+                document.getElementById('theoryResult').style.color = '#ff6b6b';
+                setTimeout(() => {
+                    const options = document.querySelectorAll('#theoryOptions .option');
+                    options[question.correct].classList.add('correct');
+                    document.getElementById('theoryResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                    document.getElementById('theoryResult').style.color = '#28a745';
+                    setTimeout(() => {
+                        currentTheoryQuestion++;
+                        theoryAttempts = 3;
+                        loadTheoryQuestion();
+                    }, 2000);
+                }, 2000);
+            });
+            
+            const optionsContainer = document.getElementById('theoryOptions');
+            optionsContainer.innerHTML = '';
+            selectedTheoryOption = null;
+            document.getElementById('theorySubmit').disabled = true;
+            document.getElementById('theoryResult').textContent = '';
+
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectTheoryOption(index, optionElement);
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function selectTheoryOption(index, element) {
+            document.querySelectorAll('#theoryOptions .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedTheoryOption = index;
+            document.getElementById('theorySubmit').disabled = false;
+        }
+
+        function submitTheoryAnswer() {
+            if (selectedTheoryOption === null) return;
+            
+            const question = shuffledTheoryQuestions[currentTheoryQuestion];
+            
+            if (selectedTheoryOption === question.correct) {
+                theoryScore++;
+                document.getElementById('theoryResult').innerHTML = '✅ <strong>Правильно!</strong> Отличная работа!';
+                document.getElementById('theoryResult').style.color = '#28a745';
+                document.querySelectorAll('#theoryOptions .option')[selectedTheoryOption].classList.add('correct');
+                if (theoryTimer) {
+                    clearInterval(theoryTimer);
+                    theoryTimer = null;
+                }
+                setTimeout(() => {
+                    currentTheoryQuestion++;
+                    theoryAttempts = 3;
+                    loadTheoryQuestion();
+                }, 2000);
+            } else {
+                theoryAttempts--;
+                document.getElementById('theoryHearts').innerHTML = getHearts(theoryAttempts);
+                const options = document.querySelectorAll('#theoryOptions .option');
+                options[selectedTheoryOption].classList.add('incorrect');
+                if (theoryAttempts <= 0) {
+                    document.getElementById('theoryResult').innerHTML = '❌ <strong>Неправильно!</strong> Правильный ответ:';
+                    document.getElementById('theoryResult').style.color = '#dc3545';
+                    
+                    setTimeout(() => {
+                        options[question.correct].classList.add('correct');
+                        document.getElementById('theoryResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                        document.getElementById('theoryResult').style.color = '#28a745';
+                        setTimeout(() => {
+                            currentTheoryQuestion++;
+                            theoryAttempts = 3;
+                            loadTheoryQuestion();
+                        }, 2000);
+                    }, 2000);
+                } else {
+                    document.getElementById('theoryResult').innerHTML = '❌ <strong>Неправильно!</strong> У вас осталось ' + theoryAttempts + ' попытка(и).';
+                    document.getElementById('theoryResult').style.color = '#dc3545';
+                    selectedTheoryOption = null;
+                    document.getElementById('theorySubmit').disabled = true;
+                    if (theoryTimer) {
+                        clearInterval(theoryTimer);
+                        theoryTimer = null;
+                    }
+                    theoryTimer = startTimer('theory', () => {
+                        document.getElementById('theoryResult').innerHTML = '⏰ <strong>Время вышло!</strong> Правильный ответ будет показан...';
+                        document.getElementById('theoryResult').style.color = '#ff6b6b';
+                        
+                        setTimeout(() => {
+                            options[question.correct].classList.add('correct');
+                            document.getElementById('theoryResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                            document.getElementById('theoryResult').style.color = '#28a745';
+                            setTimeout(() => {
+                                currentTheoryQuestion++;
+                                theoryAttempts = 3;
+                                loadTheoryQuestion();
+                            }, 2000);
+                        }, 2000);
+                    });
+                }
+            }
+        }
+
+        function loadPracticeQuestion() {
+            if (currentPracticeQuestion >= shuffledPracticeQuestions.length) {
+                document.getElementById('practice').classList.remove('active');
+                document.getElementById('final').classList.add('active');
+                document.getElementById('finalMessage').innerHTML = 
+                    `🎉 <strong>Поздравляем! Вы прошли весь квест!</strong><br><br>Практических заданий решено: ${practiceScore} из ${shuffledPracticeQuestions.length}`;
+                document.getElementById('finalScore').textContent = `Итоговый результат: ${theoryScore + practiceScore * 2} очков`;
+                createCelebration();
+                return;
+            }
+
+            const question = shuffledPracticeQuestions[currentPracticeQuestion];
+            document.getElementById('practiceLanguage').textContent = question.language;
+            document.getElementById('practiceQuestion').textContent = question.question;
+            document.getElementById('practiceCode').textContent = question.code;
+            document.getElementById('practiceCurrent').textContent = currentPracticeQuestion + 1;
+            document.getElementById('practiceTotal').textContent = shuffledPracticeQuestions.length;
+            document.getElementById('practiceHearts').innerHTML = getHearts(practiceAttempts);
+            const progressPercent = ((currentPracticeQuestion) / shuffledPracticeQuestions.length) * 100;
+            document.getElementById('practiceProgressBar').style.width = progressPercent + '%';
+            if (practiceTimer) {
+                clearInterval(practiceTimer);
+                practiceTimer = null;
+            }
+            practiceTimer = startTimer('practice', () => {
+                document.getElementById('practiceResult').innerHTML = '⏰ <strong>Время вышло!</strong> Правильный ответ будет показан...';
+                document.getElementById('practiceResult').style.color = '#ff6b6b';
+                setTimeout(() => {
+                    const options = document.querySelectorAll('#practiceOptions .option');
+                    options[question.correct].classList.add('correct');
+                    document.getElementById('practiceResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                    document.getElementById('practiceResult').style.color = '#28a745';
+                    setTimeout(() => {
+                        currentPracticeQuestion++;
+                        practiceAttempts = 3;
+                        loadPracticeQuestion();
+                    }, 2000);
+                }, 2000);
+            });
+            
+            const optionsContainer = document.getElementById('practiceOptions');
+            optionsContainer.innerHTML = '';
+            selectedPracticeOption = null;
+            document.getElementById('practiceSubmit').disabled = true;
+            document.getElementById('practiceResult').textContent = '';
+
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectPracticeOption(index, optionElement);
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function selectPracticeOption(index, element) {
+            document.querySelectorAll('#practiceOptions .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedPracticeOption = index;
+            document.getElementById('practiceSubmit').disabled = false;
+        }
+
+        function submitPracticeAnswer() {
+            if (selectedPracticeOption === null) return;
+            
+            const question = shuffledPracticeQuestions[currentPracticeQuestion];
+            
+            if (selectedPracticeOption === question.correct) {
+                practiceScore++;
+                document.getElementById('practiceResult').innerHTML = '✅ <strong>Правильно!</strong> Вы настоящий мастер кода!';
+                document.getElementById('practiceResult').style.color = '#28a745';
+                document.querySelectorAll('#practiceOptions .option')[selectedPracticeOption].classList.add('correct');
+                if (practiceTimer) {
+                    clearInterval(practiceTimer);
+                    practiceTimer = null;
+                }
+                setTimeout(() => {
+                    currentPracticeQuestion++;
+                    practiceAttempts = 3;
+                    loadPracticeQuestion();
+                }, 2000);
+            } else {
+                practiceAttempts--;
+                document.getElementById('practiceHearts').innerHTML = getHearts(practiceAttempts);
+                const options = document.querySelectorAll('#practiceOptions .option');
+                options[selectedPracticeOption].classList.add('incorrect');
+                
+                if (practiceAttempts <= 0) {
+                    document.getElementById('practiceResult').innerHTML = '❌ <strong>Неправильно!</strong> Правильный ответ:';
+                    document.getElementById('practiceResult').style.color = '#dc3545';
+                    
+                    setTimeout(() => {
+                        options[question.correct].classList.add('correct');
+                        document.getElementById('practiceResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                        document.getElementById('practiceResult').style.color = '#28a745';
+                        setTimeout(() => {
+                            currentPracticeQuestion++;
+                            practiceAttempts = 3;
+                            loadPracticeQuestion();
+                        }, 2000);
+                    }, 2000);
+                } else {
+                    document.getElementById('practiceResult').innerHTML = '❌ <strong>Неправильно!</strong> У вас осталось ' + practiceAttempts + ' попытка(и).';
+                    document.getElementById('practiceResult').style.color = '#dc3545';
+                    selectedPracticeOption = null;
+                    document.getElementById('practiceSubmit').disabled = true;
+                    if (practiceTimer) {
+                        clearInterval(practiceTimer);
+                        practiceTimer = null;
+                    }
+                    practiceTimer = startTimer('practice', () => {
+                        document.getElementById('practiceResult').innerHTML = '⏰ <strong>Время вышло!</strong> Правильный ответ будет показан...';
+                        document.getElementById('practiceResult').style.color = '#ff6b6b';
+                        setTimeout(() => {
+                            options[question.correct].classList.add('correct');
+                            document.getElementById('practiceResult').innerHTML = '✅ Правильный ответ: ' + question.options[question.correct];
+                            document.getElementById('practiceResult').style.color = '#28a745';
+                            setTimeout(() => {
+                                currentPracticeQuestion++;
+                                practiceAttempts = 3;
+                                loadPracticeQuestion();
+                            }, 2000);
+                        }, 2000);
+                    });
+                }
+            }
+        }
+
+        function restartQuiz() {
+            document.getElementById('final').classList.remove('active');
+            document.getElementById('welcome').classList.add('active');
+            if (theoryTimer) {
+                clearInterval(theoryTimer);
+                theoryTimer = null;
+            }
+            if (practiceTimer) {
+                clearInterval(practiceTimer);
+                practiceTimer = null;
+            }
+            currentTheoryQuestion = 0;
+            theoryScore = 0;
+            theoryAttempts = 3;
+            currentPracticeQuestion = 0;
+            practiceScore = 0;
+            practiceAttempts = 3;
+        }
+    </script>
+</body>
+</html>
+
